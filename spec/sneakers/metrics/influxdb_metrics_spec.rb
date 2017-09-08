@@ -68,7 +68,7 @@ RSpec.describe Sneakers::Metrics::InfluxDBMetrics do
     end
 
     context 'when param is not a String' do
-      let(:param) { 'not string type' }
+      let(:param) { :'not string type' }
 
       it { expect { subject }.to raise_error(RuntimeError) }
     end
@@ -81,7 +81,56 @@ RSpec.describe Sneakers::Metrics::InfluxDBMetrics do
   end
 
   describe '#timing' do
-    subject { instance.timing(param) }
+    let(:param) { 'work.MyWorker.time' }
+
+    subject { instance.timing(param, &block) }
+
+    context 'when param is a String' do
+      context 'when param is as expected' do
+        let(:block) do
+          x = double()
+          expect(x).to receive(:should_be_called)
+          proc { x.should_be_called }
+        end
+        let(:elapsed_time) { 0.5 }
+        let(:expected_write_params) do
+          {
+            values: { value: elapsed_time },
+            tags: {
+              worker: 'MyWorker',
+              status: 'timing'
+            }
+          }
+        end
+
+        before do
+          allow(client).to receive(:write_point)
+        end
+
+        it 'should measure elapsed time using Benchmark.realtime' do
+          expect(client).to receive(:write_point)
+                              .with(hash_including(tags: {
+                                                     worker: 'MyWorker',
+                                                     status: 'timing'
+                                                   }))
+          expect(Benchmark).to receive(:realtime).and_call_original
+          subject
+        end
+      end
+    end
+
+    context 'when param is not a String type' do
+      let(:param) { :'not string type' }
+      let(:block) { nil }
+
+      it { expect { subject }.to raise_error(RuntimeError) }
+    end
+
+    context 'when its not executed with a block' do
+      let(:block) { nil }
+
+      it { expect { subject }.to raise_error(RuntimeError) }
+    end
   end
 
   it 'has a version number' do

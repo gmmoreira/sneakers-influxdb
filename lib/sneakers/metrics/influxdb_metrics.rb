@@ -1,5 +1,6 @@
 require 'sneakers/metrics/influxdb_metrics/version'
 require 'influxdb'
+require 'benchmark'
 
 module Sneakers
   module Metrics
@@ -11,7 +12,7 @@ module Sneakers
       end
 
       def increment(metric)
-        raise RuntimeError, 'metric must be a String type' unless metric.is_a?(String)
+        raise RuntimeError, 'Metric must be a String type' unless metric.is_a?(String)
 
         tags = increment_tags(metric)
 
@@ -21,22 +22,60 @@ module Sneakers
         )
       end
 
+      def timing(metric, &block)
+        raise RuntimeError, 'Metric must be a String type' unless metric.is_a?(String)
+        raise RuntimeError, 'Timing must receive a block parameter' unless block_given?
+
+        elapsed = Benchmark.realtime(&block)
+
+        client.write_point(
+          values: { value: elapsed },
+          tags: timing_tags(metric)
+        )
+      end
+
       private
 
       def increment_tags(metric)
-        if /\Awork\.(?<worker>[^\.]+?)\.(?<status>[^\.]+?)\z/ =~ metric
+        if /\A                   #match start of string
+            work\.               #match work
+            (?<worker>[^\.]+?)\. #match worker name
+            (?<status>[^\.]+?)   #match worker status
+            \z                   #match end of string
+            /x =~ metric
           {
             worker: worker,
             status: status
           }
-        elsif /\Awork\.(?<worker>[^\.]+?)\.handled\.(?<type>[^\.]+?)\z/ =~ metric
+        elsif /\A                  #match start of string
+               work\.              #match work
+              (?<worker>[^\.]+?)\. #match worker name
+              handled\.            #match message handled
+              (?<type>[^\.]+?)     #match message handled type
+              \z                   #match end of string
+              /x =~ metric
           {
             worker: worker,
             status: 'handled',
-              type: type
+            type: type
           }
         else
-          raise RuntimeError, "Increment metrica cannot be matched. Metric: #{metric}"
+          raise RuntimeError, "Increment metric cannot be matched. Metric: #{metric}"
+        end
+      end
+
+      def timing_tags(metric)
+        if /\A                  #match start of string
+           work\.               #match work
+           (?<worker>[^\.]+?)\. #match worker name
+           time                 #match time type
+           /x =~ metric
+          {
+            worker: worker,
+            status: 'timing'
+          }
+        else
+          raise RuntimeError, "Timing metric cannot be matched. Metric: #{metric}"
         end
       end
     end

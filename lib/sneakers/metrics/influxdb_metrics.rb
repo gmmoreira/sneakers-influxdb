@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sneakers/metrics/influxdb_metrics/version'
 require 'influxdb'
 require 'benchmark'
@@ -5,10 +7,13 @@ require 'benchmark'
 module Sneakers
   module Metrics
     class InfluxDBMetrics
+      INCREMENT_SERIES = 'sneakers_increment'
+      TIMING_SERIES = 'sneakers_timing'
+
       attr_reader :client
 
-      def initialize(params)
-        @client = ::InfluxDB::Client.new(params)
+      def initialize(*params)
+        @client = ::InfluxDB::Client.new(*params)
       end
 
       def increment(metric)
@@ -17,6 +22,7 @@ module Sneakers
         tags = increment_tags(metric)
 
         client.write_point(
+          INCREMENT_SERIES,
           values: { value: 1 },
           tags: increment_tags(metric)
         )
@@ -29,12 +35,16 @@ module Sneakers
         elapsed = Benchmark.realtime(&block)
 
         client.write_point(
+          TIMING_SERIES,
           values: { value: elapsed },
           tags: timing_tags(metric)
         )
       end
 
       private
+
+      private_constant :INCREMENT_SERIES
+      private_constant :TIMING_SERIES
 
       def increment_tags(metric)
         if /\A                   #match start of string

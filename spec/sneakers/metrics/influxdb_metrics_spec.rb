@@ -23,11 +23,12 @@ RSpec.describe Sneakers::Metrics::InfluxDBMetrics do
   end
 
   describe '#increment' do
+    let(:series) { 'sneakers_increment' }
     subject { instance.increment(param) }
 
     context 'when param is a String' do
       before do
-        expect(client).to receive(:write_point).with(expected_write_params)
+        expect(client).to receive(:write_point).with(series, expected_write_params)
       end
 
       context 'when param is started type' do
@@ -81,6 +82,7 @@ RSpec.describe Sneakers::Metrics::InfluxDBMetrics do
   end
 
   describe '#timing' do
+    let(:series) { 'sneakers_timing' }
     let(:param) { 'work.MyWorker.time' }
 
     subject { instance.timing(param, &block) }
@@ -109,7 +111,7 @@ RSpec.describe Sneakers::Metrics::InfluxDBMetrics do
 
         it 'should measure elapsed time using Benchmark.realtime' do
           expect(client).to receive(:write_point)
-                              .with(hash_including(tags: {
+                              .with(series, hash_including(tags: {
                                                      worker: 'MyWorker',
                                                      status: 'timing'
                                                    }))

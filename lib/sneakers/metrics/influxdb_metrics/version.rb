@@ -1,6 +1,6 @@
 module Sneakers
   module Metrics
-    module Influxdb
+    class InfluxDBMetrics
       VERSION = "0.1.0"
     end
   end

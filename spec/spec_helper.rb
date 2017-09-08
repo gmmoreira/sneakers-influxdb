@@ -1,5 +1,5 @@
 require "bundler/setup"
-require "sneakers/metrics/influxdb"
+require "sneakers/metrics/influxdb_metrics"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

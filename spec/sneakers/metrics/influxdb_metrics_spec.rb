@@ -1,18 +1,30 @@
 require 'spec_helper'
 
 RSpec.describe Sneakers::Metrics::InfluxDBMetrics do
-  let(:params) { Hash.new(host: 'localhost') }
+  let(:db) { 'sneakers' }
+  let(:params) { { host: 'localhost' } }
   let(:client) { double(::InfluxDB::Client) }
-  subject(:instance) { described_class.new(params) }
+  subject(:instance) { described_class.new(db, params) }
 
   before do
-    allow(::InfluxDB::Client).to receive(:new).with(params).and_return(client)
+    allow(::InfluxDB::Client).to receive(:new).with(db, params).and_return(client)
   end
 
   describe '#initialize' do
-    it 'should receive params to initialize an InfluxDB::Client object' do
-      expect(::InfluxDB::Client).to receive(:new).with(params)
-      subject
+    context 'when params is db name and hash options' do
+      it 'should receive params to initialize an InfluxDB::Client object' do
+        expect(::InfluxDB::Client).to receive(:new).with(db, params)
+        subject
+      end
+    end
+
+    context 'when first param is InfluxDB::Client' do
+      subject { described_class.new(client) }
+
+      it 'should assign client' do
+        allow(client).to receive(:is_a?).with(::InfluxDB::Client).and_return(true)
+        expect(subject.client).to be client
+      end
     end
   end
 
@@ -112,9 +124,9 @@ RSpec.describe Sneakers::Metrics::InfluxDBMetrics do
         it 'should measure elapsed time using Benchmark.realtime' do
           expect(client).to receive(:write_point)
                               .with(series, hash_including(tags: {
-                                                     worker: 'MyWorker',
-                                                     status: 'timing'
-                                                   }))
+                                                             worker: 'MyWorker',
+                                                             status: 'timing'
+                                                           }))
           expect(Benchmark).to receive(:realtime).and_call_original
           subject
         end

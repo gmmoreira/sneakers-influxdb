@@ -12,8 +12,12 @@ module Sneakers
 
       attr_reader :client
 
-      def initialize(*params)
-        @client = ::InfluxDB::Client.new(*params)
+      def initialize(db_or_client, opts = {})
+        if db_or_client.is_a? ::InfluxDB::Client
+          @client = db_or_client
+        else
+          @client = ::InfluxDB::Client.new(db_or_client, opts)
+        end
       end
 
       def increment(metric)

@@ -1,4 +1,4 @@
-# Sneakers::Metrics::InfluxDB
+# Sneakers::InfluxDB
 
 This gem collect metrics from Sneakers workers and insert them in InfluxDB. Those metrics can be useful so you know how many works you are doing, how many started and ended, as well the time each work takes to execute.
 

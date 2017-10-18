@@ -9,25 +9,31 @@ This gem depends on `influxdb` gem 0.3.x. This branch supports Ruby 2.1 and less
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'sneakers-metrics-influxdb'
+gem 'sneakers-influxdb'
 ```
 
 And then execute:
 
-    $ bundle
+```shell
+$ bundle
+```
 
 Or install it yourself as:
 
-    $ gem install sneakers-metrics-influxdb
+```shell
+$ gem install sneakers-influxdb
+```
 
 ## Usage
 
-Where you configure the Sneakers gem, pass the object Sneakers::Metrics::InfluxDBMetrics to the metrics option.
+Where you configure the Sneakers gem, pass the object Sneakers::InfluxDBMetrics to the metrics option.
 
 Example:
 
 ```ruby
-influxdb_metrics = Sneakers::Metrics::InfluxDBMetrics.new('sneakers', host: 'localhost',
+require 'sneakers-influxdb'
+
+influxdb_metrics = Sneakers::InfluxDBMetrics.new('sneakers', host: 'localhost',
                                                                       port: 8086,
                                                                       username: 'admin',
                                                                       password: 'admin')
@@ -43,7 +49,7 @@ The InfluxDBMetrics initializer receives the same params as the InfluxDB::Client
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/gmmoreira/sneakers-metrics-influxdb.
+Bug reports and pull requests are welcome on GitHub at https://github.com/gmmoreira/sneakers-influxdb.
 
 ## License
 

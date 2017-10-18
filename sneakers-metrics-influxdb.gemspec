@@ -1,17 +1,17 @@
 # coding: utf-8
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "sneakers/metrics/influxdb_metrics/version"
+require "sneakers-influxdb"
 
 Gem::Specification.new do |spec|
-  spec.name          = "sneakers-metrics-influxdb"
-  spec.version       = Sneakers::Metrics::InfluxDBMetrics::VERSION
+  spec.name          = "sneakers-influxdb"
+  spec.version       = Sneakers::InfluxDBMetrics::VERSION
   spec.authors       = ["Guilherme Moreira"]
   spec.email         = ["guilhermerx7@gmail.com"]
 
   spec.summary       = %q{InfluxDB metrics for Sneakers workers}
   spec.description   = %q{}
-  spec.homepage      = "https://github.com/gmmoreira/sneakers-metrics-influxdb"
+  spec.homepage      = "https://github.com/gmmoreira/sneakers-influxdb"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'

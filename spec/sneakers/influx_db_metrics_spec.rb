@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Sneakers::Metrics::InfluxDBMetrics do
+RSpec.describe Sneakers::InfluxDBMetrics do
   let(:db) { 'sneakers' }
   let(:params) { { host: 'localhost' } }
   let(:client) { double(::InfluxDB::Client) }
@@ -148,6 +148,6 @@ RSpec.describe Sneakers::Metrics::InfluxDBMetrics do
   end
 
   it 'has a version number' do
-    expect(Sneakers::Metrics::InfluxDBMetrics::VERSION).not_to be nil
+    expect(Sneakers::InfluxDBMetrics::VERSION).not_to be nil
   end
 end
